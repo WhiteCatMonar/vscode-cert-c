@@ -1,0 +1,27 @@
+node_modules/
+out/
+*.vsix
+*.log
+.vscode-test/
+docs/internal/
+analyzer-wasm/target/
+
+# User-specific VSCode settings
+.vscode/settings.json
+.vscode/*.code-workspace
+
+# OS and editor temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.temp
+*.bak
+*.orig
+*.swp
+*.swo
+*~
+
+# Environment-local files
+.env
+.env.*

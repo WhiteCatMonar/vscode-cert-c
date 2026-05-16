@@ -1,0 +1,97 @@
+{
+  "name": "vscode-cert-c",
+  "displayName": "CERT-C Checker",
+  "description": "Rust/WASM解析コアを利用して、VSCode上でCERT-C指向のチェックを実行します。",
+  "version": "0.1.0-alpha",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:c",
+    "onLanguage:cpp"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cert-c.checkWorkspace",
+        "title": "CERT-C: ワークスペースをチェック"
+      },
+      {
+        "command": "cert-c.clearDiagnostics",
+        "title": "CERT-C: 診断をクリア"
+      }
+    ],
+    "configuration": {
+      "title": "CERT-C Checker",
+      "properties": {
+        "certC.fileGlobs": {
+          "type": "array",
+          "default": [
+            "**/*.c",
+            "**/*.h"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "解析対象ファイルを指定するワークスペースglobパターン。"
+        },
+        "certC.excludeGlobs": {
+          "type": "array",
+          "default": [
+            "**/.git/**",
+            "**/.svn/**",
+            "**/.hg/**",
+            "**/build/**",
+            "**/cmake-build-*/**",
+            "**/Debug/**",
+            "**/Release/**",
+            "**/dist/**",
+            "**/vendor/**",
+            "**/third_party/**"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "解析対象から除外するワークスペースglobパターン。"
+        },
+        "certC.analyzeOnChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "Cファイル編集中に、変更されたファイルを自動再解析します。"
+        },
+        "certC.analyzeOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Cファイル保存時に、保存されたファイルを自動再解析します。"
+        },
+        "certC.analyzeDebounceMs": {
+          "type": "number",
+          "default": 500,
+          "minimum": 0,
+          "description": "編集中の自動再解析を開始するまでの待機時間をミリ秒で指定します。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build:wasm": "cargo build --manifest-path analyzer-wasm/Cargo.toml --target wasm32-unknown-unknown --release",
+    "check:commit-message": "node scripts/check-commit-message.mjs",
+    "check:fixtures": "node scripts/check-fixtures.mjs",
+    "compile": "npm run build:wasm && tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.92.0",
+    "typescript": "^5.9.0"
+  }
+}
