@@ -1,7 +1,7 @@
 {
   "name": "vscode-cert-c",
-  "displayName": "CERT-C Checker",
-  "description": "Rust/WASM解析コアを利用して、VSCode上でCERT-C指向のチェックを実行します。",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
   "version": "0.1.0-alpha",
   "publisher": "local",
   "license": "MIT",
@@ -22,16 +22,29 @@
     "commands": [
       {
         "command": "cert-c.checkWorkspace",
-        "title": "CERT-C: ワークスペースをチェック"
+        "title": "%commands.checkWorkspace.title%"
       },
       {
         "command": "cert-c.clearDiagnostics",
-        "title": "CERT-C: 診断をクリア"
+        "title": "%commands.clearDiagnostics.title%"
       }
     ],
     "configuration": {
-      "title": "CERT-C Checker",
+      "title": "%configuration.title%",
       "properties": {
+        "certC.messageLanguage": {
+          "type": "string",
+          "default": "en",
+          "enum": [
+            "en",
+            "ja"
+          ],
+          "enumDescriptions": [
+            "%configuration.messageLanguage.enum.en%",
+            "%configuration.messageLanguage.enum.ja%"
+          ],
+          "description": "%configuration.messageLanguage.description%"
+        },
         "certC.fileGlobs": {
           "type": "array",
           "default": [
@@ -41,7 +54,7 @@
           "items": {
             "type": "string"
           },
-          "description": "解析対象ファイルを指定するワークスペースglobパターン。"
+          "description": "%configuration.fileGlobs.description%"
         },
         "certC.excludeGlobs": {
           "type": "array",
@@ -60,23 +73,23 @@
           "items": {
             "type": "string"
           },
-          "description": "解析対象から除外するワークスペースglobパターン。"
+          "description": "%configuration.excludeGlobs.description%"
         },
         "certC.analyzeOnChange": {
           "type": "boolean",
           "default": true,
-          "description": "Cファイル編集中に、変更されたファイルを自動再解析します。"
+          "description": "%configuration.analyzeOnChange.description%"
         },
         "certC.analyzeOnSave": {
           "type": "boolean",
           "default": true,
-          "description": "Cファイル保存時に、保存されたファイルを自動再解析します。"
+          "description": "%configuration.analyzeOnSave.description%"
         },
         "certC.analyzeDebounceMs": {
           "type": "number",
           "default": 500,
           "minimum": 0,
-          "description": "編集中の自動再解析を開始するまでの待機時間をミリ秒で指定します。"
+          "description": "%configuration.analyzeDebounceMs.description%"
         }
       }
     }

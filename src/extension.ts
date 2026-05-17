@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { analyzeSource, relativeLabel, toVscodeDiagnostic } from './analysis/wasmAnalyzer';
+import { CertCMessageLanguage, localize, normalizeMessageLanguage } from './localization';
 
 type CertCConfiguration = {
   fileGlobs: string[];
@@ -7,6 +8,7 @@ type CertCConfiguration = {
   analyzeOnChange: boolean;
   analyzeOnSave: boolean;
   analyzeDebounceMs: number;
+  messageLanguage: CertCMessageLanguage;
 };
 
 const diagnosticCollectionName = 'cert-c';
@@ -46,24 +48,24 @@ export function deactivate(): void {
  */
 async function checkWorkspace(extensionUri: vscode.Uri): Promise<void> {
   const folders = vscode.workspace.workspaceFolders;
+  const config = getConfiguration();
   if (!folders || folders.length === 0) {
-    void vscode.window.showWarningMessage('ワークスペースを開いてからCERT-Cチェックを実行してください。');
+    void vscode.window.showWarningMessage(localize(config.messageLanguage, 'workspace.notOpen'));
     return;
   }
 
-  const config = getConfiguration();
   clearDiagnostics();
 
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'CERT-Cチェックを実行中',
+      title: localize(config.messageLanguage, 'workspace.progressTitle'),
       cancellable: true
     },
     async (progress, token) => {
       const files = await findCandidateFiles(config);
       if (files.length === 0) {
-        void vscode.window.showInformationMessage('CERT-Cチェック対象のCソースまたはヘッダファイルが見つかりませんでした。');
+        void vscode.window.showInformationMessage(localize(config.messageLanguage, 'workspace.noFiles'));
         return;
       }
 
@@ -85,7 +87,9 @@ async function checkWorkspace(extensionUri: vscode.Uri): Promise<void> {
         byFile.set(file.toString(), items);
       }
 
-      void vscode.window.showInformationMessage(`CERT-Cチェック完了: ${countDiagnostics(byFile)}件の診断。`);
+      void vscode.window.showInformationMessage(
+        localize(config.messageLanguage, 'workspace.completed', { count: countDiagnostics(byFile) })
+      );
     }
   );
 }
@@ -147,15 +151,17 @@ function analyzeSavedDocument(extensionUri: vscode.Uri, document: vscode.TextDoc
  */
 async function analyzeDocument(extensionUri: vscode.Uri, document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
   try {
+    const config = getConfiguration();
     const result = await analyzeSource(extensionUri, document.getText());
-    const items = result.diagnostics.map(toVscodeDiagnostic);
+    const items = result.diagnostics.map((item) => toVscodeDiagnostic(item, config.messageLanguage));
     diagnostics.set(document.uri, items);
     return items;
   } catch (error) {
+    const config = getConfiguration();
     const message = error instanceof Error ? error.message : String(error);
     const diagnostic = new vscode.Diagnostic(
       new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 1)),
-      `CERT-C解析に失敗しました: ${message}`,
+      localize(config.messageLanguage, 'analysis.failed', { message }),
       vscode.DiagnosticSeverity.Error
     );
     diagnostic.source = diagnosticCollectionName;
@@ -187,7 +193,8 @@ function getConfiguration(): CertCConfiguration {
     ]),
     analyzeOnChange: config.get('analyzeOnChange', true),
     analyzeOnSave: config.get('analyzeOnSave', true),
-    analyzeDebounceMs: Math.max(config.get('analyzeDebounceMs', 500), 0)
+    analyzeDebounceMs: Math.max(config.get('analyzeDebounceMs', 500), 0),
+    messageLanguage: normalizeMessageLanguage(config.get('messageLanguage', 'en'))
   };
 }
 

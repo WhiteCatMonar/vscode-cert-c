@@ -72,10 +72,13 @@ When `certC.analyzeOnChange` is enabled, only the changed C file is automaticall
 
 When `certC.analyzeOnSave` is enabled, only the saved C file is automatically reanalyzed on save.
 
+Diagnostic messages and extension runtime messages are switched by `certC.messageLanguage`. Supported languages are `en` and `ja`, and the default for release artifacts is `en`.
+
 When analyzing this repository itself, override `certC.excludeGlobs` in the workspace settings as needed to exclude extension-development generated files.
 
 ```json
 {
+  "certC.messageLanguage": "en",
   "certC.excludeGlobs": [
     "**/.git/**",
     "**/.svn/**",

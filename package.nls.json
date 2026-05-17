@@ -1,0 +1,15 @@
+{
+  "extension.displayName": "CERT-C Checker",
+  "extension.description": "Runs CERT-C-oriented checks in VS Code using the Rust/WASM analyzer core.",
+  "commands.checkWorkspace.title": "CERT-C: Check Workspace",
+  "commands.clearDiagnostics.title": "CERT-C: Clear Diagnostics",
+  "configuration.title": "CERT-C Checker",
+  "configuration.messageLanguage.description": "Message language used for diagnostics and extension runtime messages.",
+  "configuration.messageLanguage.enum.en": "English",
+  "configuration.messageLanguage.enum.ja": "Japanese",
+  "configuration.fileGlobs.description": "Workspace glob patterns that specify files to analyze.",
+  "configuration.excludeGlobs.description": "Workspace glob patterns excluded from analysis.",
+  "configuration.analyzeOnChange.description": "Automatically reanalyze the changed C file while editing.",
+  "configuration.analyzeOnSave.description": "Automatically reanalyze the saved C file when a C file is saved.",
+  "configuration.analyzeDebounceMs.description": "Delay in milliseconds before automatic reanalysis starts while editing."
+}

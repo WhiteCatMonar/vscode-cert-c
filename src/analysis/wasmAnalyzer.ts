@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { CertCMessageLanguage, localizeDiagnosticMessage } from '../localization';
 
 type WasmExports = {
   memory: WebAssembly.Memory;
@@ -56,14 +57,15 @@ export async function analyzeSource(extensionUri: vscode.Uri, source: string): P
  * WASM解析コアの診断をVSCode Problems用の診断へ変換する。
  *
  * @param item WASM解析コアが返した1件の診断。
+ * @param messageLanguage 診断メッセージの表示言語。
  * @returns VSCode APIへ渡す診断。
  */
-export function toVscodeDiagnostic(item: AnalysisDiagnostic): vscode.Diagnostic {
+export function toVscodeDiagnostic(item: AnalysisDiagnostic, messageLanguage: CertCMessageLanguage): vscode.Diagnostic {
   const start = new vscode.Position(Math.max(item.line - 1, 0), Math.max(item.column - 1, 0));
   const end = start.translate(0, Math.max(item.length, 1));
   const diagnostic = new vscode.Diagnostic(
     new vscode.Range(start, end),
-    item.message,
+    localizeDiagnosticMessage(messageLanguage, item.ruleId, item.message),
     vscode.DiagnosticSeverity.Warning
   );
   diagnostic.code = item.ruleId;

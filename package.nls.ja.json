@@ -1,0 +1,15 @@
+{
+  "extension.displayName": "CERT-C Checker",
+  "extension.description": "Rust/WASM解析コアを利用して、VSCode上でCERT-C指向のチェックを実行します。",
+  "commands.checkWorkspace.title": "CERT-C: ワークスペースをチェック",
+  "commands.clearDiagnostics.title": "CERT-C: 診断をクリア",
+  "configuration.title": "CERT-C Checker",
+  "configuration.messageLanguage.description": "診断メッセージと拡張機能の実行時メッセージに使用する言語。",
+  "configuration.messageLanguage.enum.en": "英語",
+  "configuration.messageLanguage.enum.ja": "日本語",
+  "configuration.fileGlobs.description": "解析対象ファイルを指定するワークスペースglobパターン。",
+  "configuration.excludeGlobs.description": "解析対象から除外するワークスペースglobパターン。",
+  "configuration.analyzeOnChange.description": "Cファイル編集中に、変更されたファイルを自動再解析します。",
+  "configuration.analyzeOnSave.description": "Cファイル保存時に、保存されたファイルを自動再解析します。",
+  "configuration.analyzeDebounceMs.description": "編集中の自動再解析を開始するまでの待機時間をミリ秒で指定します。"
+}

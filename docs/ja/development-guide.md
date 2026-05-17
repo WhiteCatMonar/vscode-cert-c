@@ -68,10 +68,13 @@ CERT-C: ワークスペースをチェック
 
 `certC.analyzeOnSave`が有効な場合は、Cファイル保存時に保存されたファイルだけを自動再解析する。
 
+診断メッセージと拡張機能の実行時メッセージは、`certC.messageLanguage`で切り替える。対応言語は`en`と`ja`で、リリース物の既定値は`en`とする。
+
 このリポジトリ自身を解析対象にする場合は、拡張機能開発用の生成物を除外するため、必要に応じてワークスペース設定で`certC.excludeGlobs`を上書きする。
 
 ```json
 {
+  "certC.messageLanguage": "ja",
   "certC.excludeGlobs": [
     "**/.git/**",
     "**/.svn/**",
