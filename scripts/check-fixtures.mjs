@@ -19,7 +19,7 @@ for (const file of files) {
   const source = await fs.readFile(file, 'utf8');
   const result = analyze(source);
   const basename = path.basename(file);
-  const expectedDiagnostics = basename.startsWith('violation_') ? 1 : 0;
+  const expectedDiagnostics = expectedDiagnosticsFor(basename);
   const passed = expectedDiagnostics === 0 ? result.diagnostics.length === 0 : result.diagnostics.length > 0;
 
   if (!passed) {
@@ -29,6 +29,23 @@ for (const file of files) {
   }
 
   console.log(`OK ${path.relative(root, file)}: ${result.diagnostics.length} diagnostics`);
+}
+
+/**
+ * fixtureファイル名から期待診断数を返す。
+ *
+ * @param {string} basename fixtureファイル名。
+ * @returns {number} 違反例の場合は1、適合例の場合は0。
+ */
+function expectedDiagnosticsFor(basename) {
+  if (/_ng\.[ch]$/u.test(basename)) {
+    return 1;
+  }
+  if (/_ok\.[ch]$/u.test(basename)) {
+    return 0;
+  }
+
+  throw new Error(`fixtureファイル名は {2桁数字}_{説明}_{ok|ng}.{c|h} 形式にしてください: ${basename}`);
 }
 
 if (failures > 0) {
@@ -63,7 +80,7 @@ function analyze(source) {
  * 指定ディレクトリ以下のCソースファイルを再帰的に収集する。
  *
  * @param {string} directory 探索を開始するディレクトリ。
- * @returns {Promise<string[]>} 見つかった`.c`ファイルの絶対パス一覧。
+ * @returns {Promise<string[]>} 見つかった`.c`または`.h`ファイルの絶対パス一覧。
  */
 async function collectCFiles(directory) {
   const result = [];
@@ -73,7 +90,7 @@ async function collectCFiles(directory) {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       result.push(...await collectCFiles(fullPath));
-    } else if (entry.isFile() && entry.name.endsWith('.c')) {
+    } else if (entry.isFile() && (entry.name.endsWith('.c') || entry.name.endsWith('.h'))) {
       result.push(fullPath);
     }
   }
