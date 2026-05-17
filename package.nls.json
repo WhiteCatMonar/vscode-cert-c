@@ -3,6 +3,7 @@
   "extension.description": "Runs CERT-C-oriented checks in VS Code using the Rust/WASM analyzer core.",
   "commands.checkWorkspace.title": "CERT-C: Check Workspace",
   "commands.clearDiagnostics.title": "CERT-C: Clear Diagnostics",
+  "commands.openSettings.title": "CERT-C: Open Detection Settings",
   "configuration.title": "CERT-C Checker",
   "configuration.messageLanguage.description": "Message language used for diagnostics and extension runtime messages.",
   "configuration.messageLanguage.enum.en": "English",

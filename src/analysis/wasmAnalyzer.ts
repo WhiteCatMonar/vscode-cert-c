@@ -13,7 +13,8 @@ type WasmExports = {
 export type AnalysisDiagnostic = {
   ruleId: string;
   message: string;
-  severity: 'warning';
+  severity: 'warning' | 'information';
+  exception?: string;
   line: number;
   column: number;
   length: number;
@@ -65,12 +66,22 @@ export function toVscodeDiagnostic(item: AnalysisDiagnostic, messageLanguage: Ce
   const end = start.translate(0, Math.max(item.length, 1));
   const diagnostic = new vscode.Diagnostic(
     new vscode.Range(start, end),
-    localizeDiagnosticMessage(messageLanguage, item.ruleId, item.message),
-    vscode.DiagnosticSeverity.Warning
+    localizeDiagnosticMessage(messageLanguage, item.ruleId, item.message, item.exception),
+    toDiagnosticSeverity(item.severity)
   );
   diagnostic.code = item.ruleId;
   diagnostic.source = 'cert-c';
   return diagnostic;
+}
+
+/**
+ * WASM解析コアの重要度をVSCode診断重要度へ変換する。
+ *
+ * @param severity WASM解析コアが返した重要度。
+ * @returns VSCode APIへ渡す診断重要度。
+ */
+function toDiagnosticSeverity(severity: AnalysisDiagnostic['severity']): vscode.DiagnosticSeverity {
+  return severity === 'information' ? vscode.DiagnosticSeverity.Information : vscode.DiagnosticSeverity.Warning;
 }
 
 /**

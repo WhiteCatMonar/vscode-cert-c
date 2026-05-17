@@ -1,8 +1,10 @@
 //! PRE31-Cの検出実装。
 
 use crate::diagnostic::Diagnostic;
-use crate::lexer::{Token, tokenize};
-use crate::rules::common::{find_matching, find_next, find_side_effect};
+use crate::lexer::{Span, Token, tokenize};
+use crate::rules::common::{find_call_arguments, find_side_effect};
+
+const PRE31_C_EX1_COMMENT: &str = "/* cert-c: apply PRE31-C-EX1 */";
 
 /// PRE31-Cの診断を返す。
 ///
@@ -27,23 +29,27 @@ pub fn check(source: &str, tokens: &[Token]) -> Vec<Diagnostic> {
                 continue;
             }
 
-            let Some(open_index) = find_next(tokens, index + 1, "(") else {
-                continue;
-            };
-            let Some(close_index) = find_matching(tokens, open_index, "(", ")") else {
+            let Some(call) = find_call_arguments(tokens, index) else {
                 continue;
             };
 
-            let arguments = split_arguments(&tokens[open_index + 1..close_index]);
-            for (argument_index, argument) in arguments.iter().enumerate() {
+            for (argument_index, argument) in call.arguments.iter().enumerate() {
                 if parameters.get(argument_index).copied().unwrap_or(false) {
                     if let Some(side_effect) = find_side_effect(argument) {
-                        diagnostics.push(Diagnostic::new(
+                        let mut diagnostic = Diagnostic::new(
                             source,
                             side_effect.span,
                             "PRE31-C",
-                            "安全でない関数形式マクロへ副作用を持つ引数を渡さないでください。",
-                        ));
+                            "安全でないマクロの引数では副作用を避ける",
+                        );
+
+                        if has_pre31_c_ex1_comment(source, side_effect.span) {
+                            diagnostic = diagnostic
+                                .with_severity("information")
+                                .with_exception("PRE31-C-EX1");
+                        }
+
+                        diagnostics.push(diagnostic);
                     }
                 }
             }
@@ -63,7 +69,7 @@ pub fn check(source: &str, tokens: &[Token]) -> Vec<Diagnostic> {
 ///
 /// マクロ名と、仮引数ごとの複数回評価可能性を表す配列。
 fn find_unsafe_function_like_macros(source: &str) -> Vec<(String, Vec<bool>)> {
-    let mut macros = Vec::new();
+    let mut macros = vec![("assert".to_string(), vec![true])];
 
     for line in source.lines() {
         let trimmed = line.trim_start();
@@ -118,38 +124,39 @@ fn count_identifier_occurrences(text: &str, identifier: &str) -> usize {
         .count()
 }
 
-/// 関数呼び出しやマクロ呼び出しの実引数トークン列をカンマ区切りで分割する。
+/// PRE31-C-EX1の適用コメントが診断位置に付与されているかを返す。
 ///
 /// # 引数
 ///
-/// - `tokens`: 実引数部分のトークン列。
+/// - `source`: 解析対象のCソースコード。
+/// - `span`: 診断対象のソース範囲。
 ///
 /// # 戻り値
 ///
-/// 実引数ごとのトークン列。
-fn split_arguments(tokens: &[Token]) -> Vec<Vec<Token>> {
-    let mut arguments = Vec::new();
-    let mut current = Vec::new();
-    let mut depth = 0;
+/// 同じ行または直前行に適用コメントがある場合は`true`。
+fn has_pre31_c_ex1_comment(source: &str, span: Span) -> bool {
+    let lines: Vec<&str> = source.lines().collect();
+    let line_index = source[..span.start]
+        .bytes()
+        .filter(|byte| *byte == b'\n')
+        .count();
 
-    for token in tokens {
-        if token.text == "(" {
-            depth += 1;
-        } else if token.text == ")" && depth > 0 {
-            depth -= 1;
-        }
+    line_has_pre31_c_ex1_comment(&lines, line_index)
+        || (line_index > 0 && line_has_pre31_c_ex1_comment(&lines, line_index - 1))
+}
 
-        if token.text == "," && depth == 0 {
-            arguments.push(current);
-            current = Vec::new();
-        } else {
-            current.push(token.clone());
-        }
-    }
-
-    if !current.is_empty() {
-        arguments.push(current);
-    }
-
-    arguments
+/// 指定行にPRE31-C-EX1の適用コメントが含まれるかを返す。
+///
+/// # 引数
+///
+/// - `lines`: 改行で分割したソース行。
+/// - `line_index`: 判定対象の0始まり行番号。
+///
+/// # 戻り値
+///
+/// 固定形式の適用コメントが含まれる場合は`true`。
+fn line_has_pre31_c_ex1_comment(lines: &[&str], line_index: usize) -> bool {
+    lines
+        .get(line_index)
+        .is_some_and(|line| line.contains(PRE31_C_EX1_COMMENT))
 }

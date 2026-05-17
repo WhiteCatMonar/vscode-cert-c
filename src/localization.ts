@@ -7,7 +7,16 @@ type MessageKey =
   | 'workspace.progressTitle'
   | 'workspace.noFiles'
   | 'workspace.completed'
-  | 'analysis.failed';
+  | 'analysis.failed'
+  | 'codeAction.applyDcl37CEx3'
+  | 'codeAction.applyEnv33CEx1'
+  | 'codeAction.applyPre31CEx1'
+  | 'settings.title'
+  | 'settings.saved'
+  | 'sharedConfig.noWorkspace'
+  | 'sharedConfig.updated'
+  | 'sharedConfig.updateFailed'
+  | 'diagnostic.exceptionApplied';
 
 const messages: Record<CertCMessageLanguage, Record<MessageKey, string>> = {
   en: {
@@ -15,14 +24,32 @@ const messages: Record<CertCMessageLanguage, Record<MessageKey, string>> = {
     'workspace.progressTitle': 'Running CERT-C checks',
     'workspace.noFiles': 'No C source or header files were found for CERT-C checks.',
     'workspace.completed': 'CERT-C check completed: {count} diagnostic(s).',
-    'analysis.failed': 'CERT-C analysis failed: {message}'
+    'analysis.failed': 'CERT-C analysis failed: {message}',
+    'codeAction.applyDcl37CEx3': 'Apply DCL37-C-EX3 as standard library development code',
+    'codeAction.applyEnv33CEx1': 'Apply ENV33-C-EX1',
+    'codeAction.applyPre31CEx1': 'Apply PRE31-C-EX1',
+    'settings.title': 'CERT-C Detection Settings',
+    'settings.saved': 'Saved CERT-C shared settings.',
+    'sharedConfig.noWorkspace': 'Open a workspace before updating the CERT-C shared configuration.',
+    'sharedConfig.updated': 'Updated .vscode/cert-c_config.json: {path}',
+    'sharedConfig.updateFailed': 'Failed to update .vscode/cert-c_config.json: {message}',
+    'diagnostic.exceptionApplied': '({exception} has been applied.)'
   },
   ja: {
     'workspace.notOpen': 'ワークスペースを開いてからCERT-Cチェックを実行してください。',
     'workspace.progressTitle': 'CERT-Cチェックを実行中',
     'workspace.noFiles': 'CERT-Cチェック対象のCソースまたはヘッダファイルが見つかりませんでした。',
     'workspace.completed': 'CERT-Cチェック完了: {count}件の診断。',
-    'analysis.failed': 'CERT-C解析に失敗しました: {message}'
+    'analysis.failed': 'CERT-C解析に失敗しました: {message}',
+    'codeAction.applyDcl37CEx3': '標準ライブラリ開発コードとしてDCL37-C-EX3を適用',
+    'codeAction.applyEnv33CEx1': 'ENV33-C-EX1を適用',
+    'codeAction.applyPre31CEx1': 'PRE31-C-EX1を適用',
+    'settings.title': 'CERT-C 検出設定',
+    'settings.saved': 'CERT-C共有設定を保存しました。',
+    'sharedConfig.noWorkspace': 'CERT-C共有設定を更新するにはワークスペースを開いてください。',
+    'sharedConfig.updated': '.vscode/cert-c_config.jsonを更新しました: {path}',
+    'sharedConfig.updateFailed': '.vscode/cert-c_config.jsonの更新に失敗しました: {message}',
+    'diagnostic.exceptionApplied': '（{exception}を適用しています。）'
   }
 };
 
@@ -67,7 +94,13 @@ export function localize(
 export function localizeDiagnosticMessage(
   messageLanguage: CertCMessageLanguage,
   ruleId: string,
-  fallback: string
+  fallback: string,
+  exception?: string
 ): string {
-  return localizeRuleDiagnosticMessage(messageLanguage, ruleId, fallback);
+  const message = localizeRuleDiagnosticMessage(messageLanguage, ruleId, fallback);
+  if (!exception) {
+    return message;
+  }
+
+  return `${message} ${localize(messageLanguage, 'diagnostic.exceptionApplied', { exception })}`;
 }

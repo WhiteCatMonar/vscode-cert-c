@@ -20,8 +20,14 @@ pub fn analyze(source: &str) -> Vec<Diagnostic> {
     diagnostics.extend(rules::dcl37_c::check(source, &tokens));
     diagnostics.extend(rules::exp45_c::check(source, &tokens));
     diagnostics.extend(rules::int33_c::check(source, &tokens));
-    diagnostics.extend(rules::exp31_c::check(source, &tokens));
+    diagnostics.extend(rules::exp44_c::check(source, &tokens));
     diagnostics.extend(rules::pre31_c::check(source, &tokens));
+    diagnostics.extend(rules::pre32_c::check(source, &tokens));
+    diagnostics.extend(rules::fio41_c::check(source, &tokens));
+    diagnostics.extend(rules::env33_c::check(source, &tokens));
+    diagnostics.extend(rules::msc30_c::check(source, &tokens));
+    diagnostics.extend(rules::pos33_c::check(source, &tokens));
+    diagnostics.extend(rules::msc38_c::check(source, &tokens));
 
     diagnostics
 }

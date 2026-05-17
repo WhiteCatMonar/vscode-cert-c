@@ -70,6 +70,40 @@ CERT-C: ワークスペースをチェック
 
 診断メッセージと拡張機能の実行時メッセージは、`certC.messageLanguage`で切り替える。対応言語は`en`と`ja`で、リリース物の既定値は`en`とする。
 
+標準ライブラリ開発向け例外など、チームで共有するCERT-C検出設定は`.vscode/cert-c_config.json`に記載する。コマンドパレットから`CERT-C: 検出設定を開く`を実行すると、独自設定画面で編集できる。VSCode個人設定を混入させずに共有したい場合は、このファイルをGit管理対象にする。`.vscode`自体を共有しないチームでは、`.vscode/`をGit管理対象外にするだけでよい。
+
+```json
+{
+  "standardLibraryDevelopment": {
+    "enabled": true,
+    "pathGlobs": [
+      "libc/**/*.h",
+      "libc/**/*.c"
+    ]
+  }
+}
+```
+
+DCL37-C診断のクイックフィックスから`標準ライブラリ開発コードとしてDCL37-C-EX3を適用`を選択すると、対象ファイルのワークスペース相対パスを`.vscode/cert-c_config.json`の`standardLibraryDevelopment.pathGlobs`へ追加し、`standardLibraryDevelopment.enabled`を`true`にする。
+
+`standardLibraryDevelopment.enabled`が有効で、対象ファイルが`standardLibraryDevelopment.pathGlobs`に一致する場合、DCL37-C-EX3を含む標準ライブラリ開発向け例外規定を適用する。通常のアプリケーションコードでは有効にしない。
+
+ENV33-C-EX1を適用する場合は、ENV33-C診断のクイックフィックスから`ENV33-C-EX1を適用`を選択する。拡張機能は対象行の直前に固定形式のコメントを挿入する。
+
+```c
+/* cert-c: apply ENV33-C-EX1 */
+```
+
+このコメントが同じ行または直前行にあるENV33-C診断は、警告レベルではなく情報レベルとして表示し、診断メッセージにENV33-C-EX1適用済みであることを追記する。
+
+PRE31-C-EX1を適用する場合は、PRE31-C診断のクイックフィックスから`PRE31-C-EX1を適用`を選択する。拡張機能は対象行の直前に固定形式のコメントを挿入する。
+
+```c
+/* cert-c: apply PRE31-C-EX1 */
+```
+
+このコメントが同じ行または直前行にあるPRE31-C診断は、警告レベルではなく情報レベルとして表示し、診断メッセージにPRE31-C-EX1適用済みであることを追記する。
+
 このリポジトリ自身を解析対象にする場合は、拡張機能開発用の生成物を除外するため、必要に応じてワークスペース設定で`certC.excludeGlobs`を上書きする。
 
 ```json

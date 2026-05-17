@@ -3,6 +3,7 @@
   "extension.description": "Rust/WASM解析コアを利用して、VSCode上でCERT-C指向のチェックを実行します。",
   "commands.checkWorkspace.title": "CERT-C: ワークスペースをチェック",
   "commands.clearDiagnostics.title": "CERT-C: 診断をクリア",
+  "commands.openSettings.title": "CERT-C: 検出設定を開く",
   "configuration.title": "CERT-C Checker",
   "configuration.messageLanguage.description": "診断メッセージと拡張機能の実行時メッセージに使用する言語。",
   "configuration.messageLanguage.enum.en": "英語",

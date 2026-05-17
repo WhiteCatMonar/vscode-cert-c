@@ -27,6 +27,10 @@
       {
         "command": "cert-c.clearDiagnostics",
         "title": "%commands.clearDiagnostics.title%"
+      },
+      {
+        "command": "cert-c.openSettings",
+        "title": "%commands.openSettings.title%"
       }
     ],
     "configuration": {

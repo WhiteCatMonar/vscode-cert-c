@@ -74,6 +74,40 @@ When `certC.analyzeOnSave` is enabled, only the saved C file is automatically re
 
 Diagnostic messages and extension runtime messages are switched by `certC.messageLanguage`. Supported languages are `en` and `ja`, and the default for release artifacts is `en`.
 
+Shared CERT-C detection settings for a team, such as standard-library-development exceptions, are written in `.vscode/cert-c_config.json`. Run `CERT-C: Open Detection Settings` from the command palette to edit them in the custom settings view. Use this file when the team wants to share CERT-C settings without mixing in personal VSCode settings. Teams that do not share `.vscode` settings can exclude `.vscode/` from Git.
+
+```json
+{
+  "standardLibraryDevelopment": {
+    "enabled": true,
+    "pathGlobs": [
+      "libc/**/*.h",
+      "libc/**/*.c"
+    ]
+  }
+}
+```
+
+Choosing `Apply DCL37-C-EX3 as standard library development code` from a DCL37-C diagnostic quick fix adds the target file's workspace-relative path to `standardLibraryDevelopment.pathGlobs` in `.vscode/cert-c_config.json` and sets `standardLibraryDevelopment.enabled` to `true`.
+
+When `standardLibraryDevelopment.enabled` is enabled and the target file matches `standardLibraryDevelopment.pathGlobs`, standard-library-development exceptions, including DCL37-C-EX3, are applied. Do not enable this for ordinary application code.
+
+To apply ENV33-C-EX1, choose `Apply ENV33-C-EX1` from the quick fix for an ENV33-C diagnostic. The extension inserts the fixed-format comment immediately before the target line.
+
+```c
+/* cert-c: apply ENV33-C-EX1 */
+```
+
+An ENV33-C diagnostic with this comment on the same line or the immediately preceding line is shown as information instead of a warning, and the diagnostic message notes that ENV33-C-EX1 has been applied.
+
+To apply PRE31-C-EX1, choose `Apply PRE31-C-EX1` from the quick fix for a PRE31-C diagnostic. The extension inserts the fixed-format comment immediately before the target line.
+
+```c
+/* cert-c: apply PRE31-C-EX1 */
+```
+
+A PRE31-C diagnostic with this comment on the same line or the immediately preceding line is shown as information instead of a warning, and the diagnostic message notes that PRE31-C-EX1 has been applied.
+
 When analyzing this repository itself, override `certC.excludeGlobs` in the workspace settings as needed to exclude extension-development generated files.
 
 ```json

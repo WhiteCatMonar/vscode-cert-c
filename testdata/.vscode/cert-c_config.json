@@ -1,0 +1,8 @@
+{
+  "standardLibraryDevelopment": {
+    "enabled": false,
+    "pathGlobs": [
+      "cert-c/rules/dcl37-c/01_regular_identifier_ng.c"
+    ]
+  }
+}

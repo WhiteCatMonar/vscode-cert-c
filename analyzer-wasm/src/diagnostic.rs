@@ -7,6 +7,8 @@ use crate::utils::line_column;
 pub struct Diagnostic {
     rule_id: &'static str,
     message: &'static str,
+    severity: &'static str,
+    exception: Option<&'static str>,
     line: usize,
     column: usize,
     length: usize,
@@ -30,10 +32,40 @@ impl Diagnostic {
         Self {
             rule_id,
             message,
+            severity: "warning",
+            exception: None,
             line,
             column,
             length: (span.end - span.start).max(1),
         }
+    }
+
+    /// 診断の重要度を変更した診断を返す。
+    ///
+    /// # 引数
+    ///
+    /// - `severity`: TypeScript側へ返す診断重要度。
+    ///
+    /// # 戻り値
+    ///
+    /// 指定した重要度を持つ診断データ。
+    pub fn with_severity(mut self, severity: &'static str) -> Self {
+        self.severity = severity;
+        self
+    }
+
+    /// 適用済み例外IDを付与した診断を返す。
+    ///
+    /// # 引数
+    ///
+    /// - `exception`: 適用済み例外ID。
+    ///
+    /// # 戻り値
+    ///
+    /// 例外IDを持つ診断データ。
+    pub fn with_exception(mut self, exception: &'static str) -> Self {
+        self.exception = Some(exception);
+        self
     }
 }
 
@@ -57,12 +89,19 @@ pub fn diagnostics_to_json(diagnostics: &[Diagnostic]) -> String {
         output.push_str(diagnostic.rule_id);
         output.push_str("\",\"message\":\"");
         output.push_str(&escape_json(diagnostic.message));
-        output.push_str("\",\"severity\":\"warning\",\"line\":");
+        output.push_str("\",\"severity\":\"");
+        output.push_str(diagnostic.severity);
+        output.push_str("\",\"line\":");
         output.push_str(&diagnostic.line.to_string());
         output.push_str(",\"column\":");
         output.push_str(&diagnostic.column.to_string());
         output.push_str(",\"length\":");
         output.push_str(&diagnostic.length.to_string());
+        if let Some(exception) = diagnostic.exception {
+            output.push_str(",\"exception\":\"");
+            output.push_str(&escape_json(exception));
+            output.push('"');
+        }
         output.push('}');
     }
 

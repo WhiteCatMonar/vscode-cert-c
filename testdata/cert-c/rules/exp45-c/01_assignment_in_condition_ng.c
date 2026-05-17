@@ -1,15 +1,15 @@
 /*
- * ルール: EXP45-C
- * 期待結果: 制御式で使われた代入として診断する。
+ * EXP45-C 違反例。
+ * 選択文の制御式で代入を使用している。
  */
 
-int check(int value) {
-  int status = 0;
+int check(int value)
+{
+    int status = 0;
 
-  if (status = value) {
-    return 1;
-  }
+    if (status = value) {
+        return 1;
+    }
 
-  return 0;
+    return 0;
 }
-
