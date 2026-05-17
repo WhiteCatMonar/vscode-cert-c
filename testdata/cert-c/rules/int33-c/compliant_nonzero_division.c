@@ -1,7 +1,6 @@
 /*
  * ルール: INT33-C
  * 期待結果: 診断なし。
- * 参照元: https://www.jpcert.or.jp/sc-rules/
  */
 
 int divide(int value) {
